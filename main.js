@@ -1,12 +1,12 @@
-var express = require('express');
-var app = express();
-var WebTorrent = require('webtorrent')
-var client = new WebTorrent()
-var path = require('path');
+const express = require('express');
+const app = express();
+const WebTorrent = require('webtorrent')
+const client = new WebTorrent()
+const path = require('path');
 
 app.use(function(req, res, next) {
-  var allowedOrigins = ['http://127.0.0.1:3010', 'http://localhost:8080'];
-  var origin = req.headers.origin;
+  let allowedOrigins = ['http://127.0.0.1:3010', 'http://localhost:8080'];
+  let origin = req.headers.origin;
   if(allowedOrigins.indexOf(origin) > -1){
        res.setHeader('Access-Control-Allow-Origin', origin);
   }
@@ -37,8 +37,8 @@ app.get('/add/torrent/:magnet', (req, res) => {
 	}
 })
 
-var getLargestFile = function (torrent) {
-    var file;
+const getLargestFile = function (torrent) {
+    const file;
     for(i = 0; i < torrent.files.length; i++) {
         if (!file || file.length < torrent.files[i].length) {
             file = torrent.files[i];
@@ -52,24 +52,24 @@ app.get('/stream/torrent/:magnet', (req, res) => {
 		
 		let magnetURI = 'magnet:?xt=urn:btih:'+req.params.magnet
 
-		var torrent = client.get(magnetURI)
-        var file = getLargestFile(torrent)
-        var total = file.length
+		const torrent = client.get(magnetURI)
+        const file = getLargestFile(torrent)
+        const total = file.length
 
         if(typeof req.headers.range != 'undefined') {
-            var range = req.headers.range;
-            var parts = range.replace(/bytes=/, "").split("-");
-            var partialstart = parts[0];
-            var partialend = parts[1];
-            var start = parseInt(partialstart, 10);
-            var end = partialend ? parseInt(partialend, 10) : total - 1;
-            var chunksize = (end - start) + 1;
+            const range = req.headers.range;
+            const parts = range.replace(/bytes=/, "").split("-");
+            const partialstart = parts[0];
+            const partialend = parts[1];
+            const start = parseInt(partialstart, 10);
+            const end = partialend ? parseInt(partialend, 10) : total - 1;
+            const chunksize = (end - start) + 1;
         } else {
-            var start = 0; var end = total;
-			var chunksize = (end - start) + 1;
+            const start = 0; var end = total;
+			const chunksize = (end - start) + 1;
         }
 
-        var stream = file.createReadStream({start: start, end: end})
+        const stream = file.createReadStream({start: start, end: end})
         res.writeHead(206, { 
 			'Content-Range': 'bytes ' + start + '-' + end + '/' + total, 
 			'Accept-Ranges': 'bytes', 'Content-Length': chunksize, 
